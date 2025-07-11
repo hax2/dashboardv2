@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/apiClient';
-import { Project } from './Dashboard';
+import { Project } from './ProjectList';
 
 interface ProjectCardProps {
     project: Project;
