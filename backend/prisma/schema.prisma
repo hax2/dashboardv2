@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  
+  projects     Project[]
+  tasks        Task[] // Task Templates
+  taskInstances TaskInstance[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  status      Status   @default(active)
+  createdAt   DateTime @default(now())
+  
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  
+  tasks Task[] @relation("ProjectTasks")
+}
+
+// This table now acts as our "Task Template" definition
+model Task {
+  id                 String   @id @default(uuid())
+  title              String
+  type               TaskType
+  
+  // These are for recurring tasks, not used by 'daily' type anymore
+  lastCompletedAt    DateTime?
+  recurrenceInterval Int?
+  
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  
+  // Relation for project subtasks
+  project   Project? @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
+
+  // Relation to all the daily logs for this task template
+  instances TaskInstance[]
+}
+
+// NEW! This table logs the completion for a specific task on a specific day.
+model TaskInstance {
+  id          String  @id @default(uuid())
+  isCompleted Boolean @default(false)
+  
+  // The specific date this log is for. We use an index for fast lookups.
+  date        DateTime @db.Date
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
+
+  // A task can only have one instance per day for a user.
+  @@unique([userId, taskId, date])
+}
+
+enum Status {
+  active
+  completed
+  archived
+}
+
+enum TaskType {
+  daily
+  recurring
+  project_subtask
+}
