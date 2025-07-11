@@ -7,10 +7,7 @@
     },
     {
       "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "defaults": {
-        "maxLambdaSize": "45mb"
-      }
+      "use": "@vercel/static-build"
     }
   ],
   "rewrites": [
