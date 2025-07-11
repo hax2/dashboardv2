@@ -61,7 +61,7 @@ export const DailyTasks = () => {
                                 type="checkbox"
                                 checked={task.isCompleted}
                                 onChange={() => handleCheckboxChange(task.id, task.isCompleted)}
-                                disabled={logTaskMutation.isLoading}
+                                disabled={logTaskMutation.isPending}
                             />
                             {task.title}
                         </label>
@@ -78,7 +78,7 @@ export const DailyTasks = () => {
                     onChange={(e) => setNewTemplateTitle(e.target.value)}
                     placeholder="Add new daily task"
                 />
-                <button type="submit" disabled={createTemplateMutation.isLoading}>Add</button>
+                <button type="submit" disabled={createTemplateMutation.isPending}>Add</button>
             </form>
         </div>
     );
